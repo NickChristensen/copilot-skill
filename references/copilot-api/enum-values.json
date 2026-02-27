@@ -1,0 +1,71 @@
+{
+  "byEnumType": {
+    "TimeFrame": {
+      "values": [
+        "ONE_DAY",
+        "ONE_WEEK",
+        "ONE_MONTH",
+        "THREE_MONTHS",
+        "ONE_YEAR",
+        "YTD",
+        "ALL"
+      ],
+      "status": "observed",
+      "notes": "ONE_DAY observed on security-level pricing and select holdings views."
+    },
+    "TopMoversFilter": {
+      "values": [
+        "PRICE_CHANGE",
+        "MY_EQUITY_CHANGE"
+      ],
+      "status": "observed"
+    },
+    "AggregatedHoldingsFilter": {
+      "values": [
+        "LAST_PRICE",
+        "MY_EQUITY",
+        "QUANTITY",
+        "EQUITY_ALLOCATION"
+      ],
+      "status": "observed"
+    },
+    "RecurringKeyMetricsFrequency": {
+      "values": [
+        "MONTHLY",
+        "ANNUALLY"
+      ],
+      "status": "observed"
+    },
+    "SortDirection": {
+      "values": [
+        "ASC",
+        "DESC"
+      ],
+      "status": "observed"
+    },
+    "TransactionSortField": {
+      "values": [
+        "DATE"
+      ],
+      "status": "observed"
+    },
+    "AccountType": {
+      "values": [
+        "INVESTMENT",
+        "REAL_ESTATE"
+      ],
+      "status": "observed"
+    }
+  },
+  "byVariableName": {
+    "timeFrame": {
+      "enumType": "TimeFrame"
+    },
+    "filter": {
+      "notes": "Filter object may contain nested enum fields depending on operation; inspect operation examples."
+    },
+    "keyMetricsFrequency": {
+      "enumType": "RecurringKeyMetricsFrequency"
+    }
+  }
+}

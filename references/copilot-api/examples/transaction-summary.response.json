@@ -1,0 +1,11 @@
+{
+  "data": {
+    "transactionsSummary": {
+      "transactionsCount": 42,
+      "totalNetIncome": -123456,
+      "totalIncome": 250000,
+      "totalSpent": 373456,
+      "__typename": "TransactionsSummary"
+    }
+  }
+}

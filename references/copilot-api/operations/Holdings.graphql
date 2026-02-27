@@ -1,0 +1,34 @@
+query Holdings {
+  holdings {
+    security {
+      ...SecurityFields
+      __typename
+    }
+    metrics {
+      averageCost
+      totalReturn
+      costBasis
+      __typename
+    }
+    accountId
+    quantity
+    itemId
+    id
+    __typename
+  }
+}
+
+fragment SecurityFields on Security {
+  marketInfo {
+    closeTime
+    openTime
+    __typename
+  }
+  currentPrice
+  lastUpdate
+  symbol
+  name
+  type
+  id
+  __typename
+}

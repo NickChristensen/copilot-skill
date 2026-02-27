@@ -1,0 +1,7 @@
+{
+  "operationName": "InvestmentBalance",
+  "variables": {
+    "timeFrame": "ONE_WEEK"
+  },
+  "query_ref": "../../operations/InvestmentBalance.graphql"
+}

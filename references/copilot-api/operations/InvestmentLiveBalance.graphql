@@ -1,0 +1,8 @@
+query InvestmentLiveBalance {
+  investmentLiveBalance {
+    id
+    date
+    balance
+    __typename
+  }
+}

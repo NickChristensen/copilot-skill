@@ -1,0 +1,7 @@
+{
+  "operationName": "TopMovers",
+  "variables": {
+    "filter": "PRICE_CHANGE"
+  },
+  "query_ref": "../../operations/TopMovers.graphql"
+}

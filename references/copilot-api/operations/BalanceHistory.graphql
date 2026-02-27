@@ -1,0 +1,16 @@
+query BalanceHistory($itemId: ID!, $accountId: ID!, $timeFrame: TimeFrame) {
+  accountBalanceHistory(
+    itemId: $itemId
+    accountId: $accountId
+    timeFrame: $timeFrame
+  ) {
+    ...BalanceFields
+    __typename
+  }
+}
+
+fragment BalanceFields on AccountBalanceHistory {
+  balance
+  date
+  __typename
+}

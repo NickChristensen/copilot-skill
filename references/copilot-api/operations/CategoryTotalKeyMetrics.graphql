@@ -1,0 +1,11 @@
+query CategoryTotalKeyMetrics {
+  categoriesTotal {
+    keyMetrics {
+      averageMonthlySpent
+      totalSpent
+      year
+      __typename
+    }
+    __typename
+  }
+}

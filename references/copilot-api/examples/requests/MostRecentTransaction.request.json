@@ -1,0 +1,9 @@
+{
+  "operationName": "MostRecentTransaction",
+  "variables": {
+    "filter": {
+      "recurringId": "<redacted>"
+    }
+  },
+  "query_ref": "../../operations/MostRecentTransaction.graphql"
+}

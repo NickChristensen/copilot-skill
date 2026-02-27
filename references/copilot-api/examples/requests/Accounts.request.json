@@ -1,0 +1,10 @@
+{
+  "operationName": "Accounts",
+  "variables": {
+    "accountLink": false,
+    "filter": {
+      "type": "INVESTMENT"
+    }
+  },
+  "query_ref": "../../operations/Accounts.graphql"
+}

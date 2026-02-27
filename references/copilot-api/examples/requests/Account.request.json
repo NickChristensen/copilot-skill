@@ -1,0 +1,9 @@
+{
+  "operationName": "Account",
+  "variables": {
+    "accountLink": true,
+    "itemId": "<redacted>",
+    "id": "<redacted>"
+  },
+  "query_ref": "../../operations/Account.graphql"
+}

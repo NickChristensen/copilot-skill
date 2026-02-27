@@ -1,0 +1,7 @@
+query AmountTotalMonthly($itemId: ID!, $accountId: ID!) {
+  accountMonthlyTotal(itemId: $itemId, accountId: $accountId) {
+    date
+    totalAmount
+    __typename
+  }
+}

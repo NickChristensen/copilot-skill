@@ -1,0 +1,12 @@
+query CategoryKeyMetrics($id: ID!) {
+  category(id: $id) {
+    id
+    keyMetrics {
+      averageMonthlySpent
+      totalSpent
+      year
+      __typename
+    }
+    __typename
+  }
+}

@@ -1,0 +1,8 @@
+query SecurityPricesHighFrequency($id: ID!, $timeFrame: TimeFrame) {
+  securityPricesHighFrequency(securityId: $id, timeFrame: $timeFrame) {
+    timestamp
+    price
+    id
+    __typename
+  }
+}

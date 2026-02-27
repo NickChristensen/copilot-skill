@@ -1,0 +1,5 @@
+{
+  "operationName": "InvestmentLiveBalance",
+  "variables": {},
+  "query_ref": "../../operations/InvestmentLiveBalance.graphql"
+}

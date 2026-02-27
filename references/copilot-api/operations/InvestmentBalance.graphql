@@ -1,0 +1,8 @@
+query InvestmentBalance($timeFrame: TimeFrame) {
+  investmentBalance(timeFrame: $timeFrame) {
+    id
+    date
+    balance
+    __typename
+  }
+}

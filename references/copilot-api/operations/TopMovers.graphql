@@ -1,0 +1,31 @@
+query TopMovers($filter: TopMoversFilter) {
+  topMovers(filter: $filter) {
+    security {
+      ...SecurityFields
+      __typename
+    }
+    values {
+      timestamp
+      price
+      id
+      __typename
+    }
+    change
+    __typename
+  }
+}
+
+fragment SecurityFields on Security {
+  marketInfo {
+    closeTime
+    openTime
+    __typename
+  }
+  currentPrice
+  lastUpdate
+  symbol
+  name
+  type
+  id
+  __typename
+}

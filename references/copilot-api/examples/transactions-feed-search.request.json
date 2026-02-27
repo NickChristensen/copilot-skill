@@ -1,0 +1,17 @@
+{
+  "operationName": "TransactionsFeed",
+  "variables": {
+    "month": true,
+    "filter": {
+      "matchString": "example search"
+    },
+    "sort": [
+      {
+        "direction": "DESC",
+        "field": "DATE"
+      }
+    ],
+    "first": 25
+  },
+  "query_ref": "../operations/TransactionsFeed.graphql"
+}

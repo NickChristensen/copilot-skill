@@ -1,0 +1,7 @@
+{
+  "operationName": "TransactionSummary",
+  "variables": {
+    "filter": {}
+  },
+  "query_ref": "../operations/TransactionSummary.graphql"
+}

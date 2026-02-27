@@ -1,0 +1,5 @@
+{
+  "operationName": "Tags",
+  "variables": {},
+  "query_ref": "../operations/Tags.graphql"
+}

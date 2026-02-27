@@ -1,0 +1,5 @@
+{
+  "operationName": "InvestmentAllocation",
+  "variables": {},
+  "query_ref": "../../operations/InvestmentAllocation.graphql"
+}

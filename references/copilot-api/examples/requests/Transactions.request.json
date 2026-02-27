@@ -1,0 +1,21 @@
+{
+  "operationName": "Transactions",
+  "variables": {
+    "filter": {
+      "accountIds": [
+        {
+          "accountId": "<redacted>",
+          "itemId": "<redacted>"
+        }
+      ]
+    },
+    "sort": [
+      {
+        "direction": "DESC",
+        "field": "DATE"
+      }
+    ],
+    "first": 25
+  },
+  "query_ref": "../../operations/Transactions.graphql"
+}

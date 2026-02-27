@@ -1,0 +1,14 @@
+query InvestmentAllocation($filter: AllocationFilter) {
+  investmentAllocation(filter: $filter) {
+    ...AllocationFields
+    __typename
+  }
+}
+
+fragment AllocationFields on Allocation {
+  percentage
+  amount
+  type
+  id
+  __typename
+}

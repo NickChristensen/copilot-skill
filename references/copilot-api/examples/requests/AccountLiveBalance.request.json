@@ -1,0 +1,8 @@
+{
+  "operationName": "AccountLiveBalance",
+  "variables": {
+    "itemId": "<redacted>",
+    "accountId": "<redacted>"
+  },
+  "query_ref": "../../operations/AccountLiveBalance.graphql"
+}

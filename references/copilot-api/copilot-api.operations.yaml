@@ -1,0 +1,105 @@
+version: 7
+service: copilot-money
+captured_on: 2026-02-27
+graphql:
+  endpoint: https://app.copilot.money/api/graphql
+  auth: ./copilot-auth.yaml
+capture:
+  source_file: ../copilot-captured-graphql-ops.raw.json
+  total_requests: 101
+
+operations:
+  - name: Account
+    type: query
+    query_file: ./operations/Account.graphql
+    request_example: ./examples/requests/Account.request.json
+  - name: AccountLiveBalance
+    type: query
+    query_file: ./operations/AccountLiveBalance.graphql
+    request_example: ./examples/requests/AccountLiveBalance.request.json
+  - name: Accounts
+    type: query
+    query_file: ./operations/Accounts.graphql
+    request_example: ./examples/requests/Accounts.request.json
+  - name: AggregatedHoldings
+    type: query
+    query_file: ./operations/AggregatedHoldings.graphql
+    request_example: ./examples/requests/AggregatedHoldings.request.json
+  - name: AmountTotalMonthly
+    type: query
+    query_file: ./operations/AmountTotalMonthly.graphql
+    request_example: ./examples/requests/AmountTotalMonthly.request.json
+  - name: BalanceHistory
+    type: query
+    query_file: ./operations/BalanceHistory.graphql
+    request_example: ./examples/requests/BalanceHistory.request.json
+  - name: CategoryKeyMetrics
+    type: query
+    query_file: ./operations/CategoryKeyMetrics.graphql
+    request_example: ./examples/requests/CategoryKeyMetrics.request.json
+  - name: CategoryTotalKeyMetrics
+    type: query
+    query_file: ./operations/CategoryTotalKeyMetrics.graphql
+    request_example: ./examples/requests/CategoryTotalKeyMetrics.request.json
+  - name: Holdings
+    type: query
+    query_file: ./operations/Holdings.graphql
+    request_example: ./examples/requests/Holdings.request.json
+  - name: Institution
+    type: query
+    query_file: ./operations/Institution.graphql
+    request_example: ./examples/requests/Institution.request.json
+  - name: InvestmentAllocation
+    type: query
+    query_file: ./operations/InvestmentAllocation.graphql
+    request_example: ./examples/requests/InvestmentAllocation.request.json
+  - name: InvestmentBalance
+    type: query
+    query_file: ./operations/InvestmentBalance.graphql
+    request_example: ./examples/requests/InvestmentBalance.request.json
+  - name: InvestmentLiveBalance
+    type: query
+    query_file: ./operations/InvestmentLiveBalance.graphql
+    request_example: ./examples/requests/InvestmentLiveBalance.request.json
+  - name: MostRecentTransaction
+    type: query
+    query_file: ./operations/MostRecentTransaction.graphql
+    request_example: ./examples/requests/MostRecentTransaction.request.json
+  - name: RecurringKeyMetrics
+    type: query
+    query_file: ./operations/RecurringKeyMetrics.graphql
+    request_example: ./examples/requests/RecurringKeyMetrics.request.json
+  - name: Recurrings
+    type: query
+    query_file: ./operations/Recurrings.graphql
+    request_example: ./examples/requests/Recurrings.request.json
+  - name: SecurityPricesHighFrequency
+    type: query
+    query_file: ./operations/SecurityPricesHighFrequency.graphql
+    request_example: ./examples/requests/SecurityPricesHighFrequency.request.json
+  - name: Tags
+    type: query
+    query_file: ./operations/Tags.graphql
+    request_example: ./examples/requests/Tags.request.json
+  - name: TopMovers
+    type: query
+    query_file: ./operations/TopMovers.graphql
+    request_example: ./examples/requests/TopMovers.request.json
+  - name: TransactionSummary
+    type: query
+    query_file: ./operations/TransactionSummary.graphql
+    request_example: ./examples/requests/TransactionSummary.request.json
+  - name: Transactions
+    type: query
+    query_file: ./operations/Transactions.graphql
+    request_example: ./examples/requests/Transactions.request.json
+  - name: TransactionsFeed
+    type: query
+    query_file: ./operations/TransactionsFeed.graphql
+    request_example: ./examples/requests/TransactionsFeed.request.json
+
+notes:
+  - Generated from observed traffic while navigating Dashboard, Transactions, Accounts, Investments, Categories, and Recurrings.
+  - Includes detail-view captures for transactional account, investment account, holding detail, category detail, and recurring detail.
+  - Introspection is disabled in production; recapture periodically to detect drift.
+  - Request examples are redacted for sensitive IDs/tokens.

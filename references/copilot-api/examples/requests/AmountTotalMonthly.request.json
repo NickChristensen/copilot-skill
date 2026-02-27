@@ -1,0 +1,8 @@
+{
+  "operationName": "AmountTotalMonthly",
+  "variables": {
+    "accountId": "<redacted>",
+    "itemId": "<redacted>"
+  },
+  "query_ref": "../../operations/AmountTotalMonthly.graphql"
+}

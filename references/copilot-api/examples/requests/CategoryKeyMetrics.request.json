@@ -1,0 +1,7 @@
+{
+  "operationName": "CategoryKeyMetrics",
+  "variables": {
+    "id": "<redacted>"
+  },
+  "query_ref": "../../operations/CategoryKeyMetrics.graphql"
+}

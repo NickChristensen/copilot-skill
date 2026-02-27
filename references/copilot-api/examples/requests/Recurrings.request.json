@@ -1,0 +1,9 @@
+{
+  "operationName": "Recurrings",
+  "variables": {
+    "filter": {
+      "categoryId": "<redacted>"
+    }
+  },
+  "query_ref": "../../operations/Recurrings.graphql"
+}

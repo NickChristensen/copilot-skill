@@ -1,0 +1,8 @@
+{
+  "operationName": "AggregatedHoldings",
+  "variables": {
+    "filter": "LAST_PRICE",
+    "timeFrame": "ONE_WEEK"
+  },
+  "query_ref": "../../operations/AggregatedHoldings.graphql"
+}

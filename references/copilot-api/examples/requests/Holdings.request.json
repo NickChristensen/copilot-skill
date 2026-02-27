@@ -1,0 +1,5 @@
+{
+  "operationName": "Holdings",
+  "variables": {},
+  "query_ref": "../../operations/Holdings.graphql"
+}

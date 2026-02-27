@@ -1,0 +1,8 @@
+{
+  "operationName": "SecurityPricesHighFrequency",
+  "variables": {
+    "id": "<redacted>",
+    "timeFrame": "ONE_WEEK"
+  },
+  "query_ref": "../../operations/SecurityPricesHighFrequency.graphql"
+}

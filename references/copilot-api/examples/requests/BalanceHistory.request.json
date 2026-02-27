@@ -1,0 +1,9 @@
+{
+  "operationName": "BalanceHistory",
+  "variables": {
+    "itemId": "<redacted>",
+    "accountId": "<redacted>",
+    "timeFrame": "ONE_WEEK"
+  },
+  "query_ref": "../../operations/BalanceHistory.graphql"
+}

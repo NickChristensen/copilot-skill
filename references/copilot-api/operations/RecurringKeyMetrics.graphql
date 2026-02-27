@@ -1,0 +1,12 @@
+query RecurringKeyMetrics($id: ID!, $keyMetricsFrequency: RecurringKeyMetricsFrequency = MONTHLY) {
+  recurring(id: $id) {
+    id
+    keyMetrics(keyMetricsFrequency: $keyMetricsFrequency) {
+      averageTransactionAmount
+      totalSpent
+      period
+      __typename
+    }
+    __typename
+  }
+}

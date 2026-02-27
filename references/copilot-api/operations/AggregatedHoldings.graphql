@@ -1,0 +1,25 @@
+query AggregatedHoldings($timeFrame: TimeFrame, $filter: AggregatedHoldingsFilter, $accountId: ID, $itemId: ID) {
+  aggregatedHoldings(
+    timeFrame: $timeFrame
+    filter: $filter
+    accountId: $accountId
+    itemId: $itemId
+  ) {
+    security {
+      marketInfo {
+        closeTime
+        openTime
+        __typename
+      }
+      lastUpdate
+      symbol
+      name
+      type
+      id
+      __typename
+    }
+    change
+    value
+    __typename
+  }
+}

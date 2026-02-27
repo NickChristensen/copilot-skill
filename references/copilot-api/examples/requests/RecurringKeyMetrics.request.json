@@ -1,0 +1,8 @@
+{
+  "operationName": "RecurringKeyMetrics",
+  "variables": {
+    "keyMetricsFrequency": "MONTHLY",
+    "id": "<redacted>"
+  },
+  "query_ref": "../../operations/RecurringKeyMetrics.graphql"
+}
