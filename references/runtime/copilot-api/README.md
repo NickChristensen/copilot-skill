@@ -8,6 +8,8 @@ This folder contains a machine-friendly capture of Copilot's production GraphQL 
 - `copilot-api.operations.yaml`: canonical operation catalog.
 - `operations/*.graphql`: captured query text per operation.
 - `examples/requests/*.request.json`: redacted request examples.
+- `operation-semantics.json`: operation descriptions and relationship hints.
+- `use-cases.md`: task-oriented recipes for common data retrieval goals.
 
 ## Capture scope
 

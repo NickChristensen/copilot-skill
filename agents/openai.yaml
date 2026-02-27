@@ -1,4 +1,0 @@
-interface:
-  display_name: "Copilot Money API"
-  short_description: "Authenticate and run captured Copilot GraphQL operations."
-  default_prompt: "Use this skill to refresh Firebase auth tokens and run Copilot Money GraphQL operations from the local captured catalog files."

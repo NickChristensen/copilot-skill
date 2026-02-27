@@ -1,0 +1,172 @@
+{
+  "operations": {
+    "Account": {
+      "description": "Fetch a single account by itemId + account id, optionally including linked account metadata.",
+      "good_for": [
+        "Resolve account details for a known id",
+        "Confirm account type/subtype before deeper queries"
+      ],
+      "related": ["Accounts", "Institution", "BalanceHistory"]
+    },
+    "AccountLiveBalance": {
+      "description": "Fetch the freshest live balance snapshot for a specific account.",
+      "good_for": [
+        "Show current account balance",
+        "Compare latest value vs historical trend"
+      ],
+      "related": ["BalanceHistory", "Account"]
+    },
+    "Accounts": {
+      "description": "List accounts, optionally filtered by account type, with optional account-link info.",
+      "good_for": [
+        "Discover account and item ids for later calls",
+        "Filter to investment or real-estate accounts"
+      ],
+      "related": ["Account", "Institution", "BalanceHistory"]
+    },
+    "AggregatedHoldings": {
+      "description": "Return holdings aggregates for a timeframe and aggregation filter, optionally scoped to account/item.",
+      "good_for": [
+        "Investment account composition analysis",
+        "Top-position and allocation style views"
+      ],
+      "related": ["Holdings", "InvestmentAllocation", "SecurityPricesHighFrequency"]
+    },
+    "AmountTotalMonthly": {
+      "description": "Return monthly total amount series for a specific account.",
+      "good_for": [
+        "Account-level monthly spend/income trend",
+        "Detail-page account spending chart equivalents"
+      ],
+      "related": ["Transactions", "TransactionSummary"]
+    },
+    "BalanceHistory": {
+      "description": "Return historical account balance points over a chosen timeframe.",
+      "good_for": [
+        "Balance trend charts",
+        "Account performance over time"
+      ],
+      "related": ["AccountLiveBalance", "Accounts"]
+    },
+    "CategoryKeyMetrics": {
+      "description": "Return key metrics for a specific category id.",
+      "good_for": [
+        "Category detail analytics",
+        "Average monthly spend and total spent for one category"
+      ],
+      "related": ["TransactionsFeed", "TransactionSummary", "Recurrings"]
+    },
+    "CategoryTotalKeyMetrics": {
+      "description": "Return top-level category metrics across categories.",
+      "good_for": [
+        "Category overview dashboard metrics"
+      ],
+      "related": ["CategoryKeyMetrics"]
+    },
+    "Holdings": {
+      "description": "Return raw holdings positions with security and metrics fields.",
+      "good_for": [
+        "Position-level inventory",
+        "Detailed holdings export workflows"
+      ],
+      "related": ["AggregatedHoldings", "InvestmentAllocation", "TopMovers"]
+    },
+    "Institution": {
+      "description": "Fetch institution metadata and provider info by institution id.",
+      "good_for": [
+        "Account provider diagnostics",
+        "Display logos/institution names in reports"
+      ],
+      "related": ["Accounts", "Account"]
+    },
+    "InvestmentAllocation": {
+      "description": "Return portfolio allocation breakdown, optionally scoped by account/item.",
+      "good_for": [
+        "Asset allocation analysis",
+        "Investment detail-page allocation summaries"
+      ],
+      "related": ["AggregatedHoldings", "Holdings"]
+    },
+    "InvestmentBalance": {
+      "description": "Return investment balance time series for a timeframe.",
+      "good_for": [
+        "Portfolio value trend by timeframe"
+      ],
+      "related": ["InvestmentLiveBalance", "TopMovers"]
+    },
+    "InvestmentLiveBalance": {
+      "description": "Return current total investment live balance snapshot.",
+      "good_for": [
+        "Latest investment portfolio balance"
+      ],
+      "related": ["InvestmentBalance"]
+    },
+    "MostRecentTransaction": {
+      "description": "Fetch the newest transaction matching a filter.",
+      "good_for": [
+        "Quick recency check for recurring or category-specific activity"
+      ],
+      "related": ["Transactions", "TransactionsFeed"]
+    },
+    "RecurringKeyMetrics": {
+      "description": "Fetch recurring key metrics for a recurring id at monthly/annual granularity.",
+      "good_for": [
+        "Recurring spend trend and average amount analysis"
+      ],
+      "related": ["Recurrings", "MostRecentTransaction", "Transactions"]
+    },
+    "Recurrings": {
+      "description": "List recurring entities, optionally filtered by category.",
+      "good_for": [
+        "Recurring payment inventory",
+        "Category-to-recurring mapping"
+      ],
+      "related": ["RecurringKeyMetrics", "MostRecentTransaction"]
+    },
+    "SecurityPricesHighFrequency": {
+      "description": "Return high-frequency security price points for a security id/timeframe.",
+      "good_for": [
+        "Holding detail intraday/short-term price trend"
+      ],
+      "related": ["AggregatedHoldings", "TopMovers"]
+    },
+    "Tags": {
+      "description": "List all user tags.",
+      "good_for": [
+        "Tag metadata lookup",
+        "Tag-aware transaction workflows"
+      ],
+      "related": ["Transactions", "TransactionsFeed"]
+    },
+    "TopMovers": {
+      "description": "Return movers list based on selected mover filter.",
+      "good_for": [
+        "Investment movers dashboard",
+        "Price-change and equity-change leaderboards"
+      ],
+      "related": ["InvestmentBalance", "Holdings", "AggregatedHoldings"]
+    },
+    "TransactionSummary": {
+      "description": "Return aggregate transaction totals/counts for a filter.",
+      "good_for": [
+        "Fast aggregate metrics for searches and scoped filters"
+      ],
+      "related": ["TransactionsFeed", "Transactions"]
+    },
+    "Transactions": {
+      "description": "Return paginated transaction list using classic pagination fields.",
+      "good_for": [
+        "Account detail and recurring detail transaction lists"
+      ],
+      "related": ["TransactionSummary", "MostRecentTransaction"]
+    },
+    "TransactionsFeed": {
+      "description": "Return feed-style paginated transactions, with optional month-group nodes.",
+      "good_for": [
+        "General transaction browsing",
+        "Search/category/account scoped transaction feeds"
+      ],
+      "related": ["TransactionSummary", "Transactions"]
+    }
+  }
+}

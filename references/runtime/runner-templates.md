@@ -5,6 +5,7 @@ Prefer the Node runner:
 ```bash
 node scripts/copilot-gql.mjs help
 node scripts/copilot-gql.mjs list
+node scripts/copilot-gql.mjs list --descriptions
 node scripts/copilot-gql.mjs show TransactionsFeed
 node scripts/copilot-gql.mjs show AggregatedHoldings
 node scripts/copilot-gql.mjs token

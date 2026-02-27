@@ -9,6 +9,7 @@ const ENV_PATH = path.join(ROOT, ".env");
 const OPERATIONS_DIR = path.join(ROOT, "references", "runtime", "copilot-api", "operations");
 const REQUESTS_DIR = path.join(ROOT, "references", "runtime", "copilot-api", "examples", "requests");
 const ENUM_VALUES_PATH = path.join(ROOT, "references", "runtime", "copilot-api", "enum-values.json");
+const SEMANTICS_PATH = path.join(ROOT, "references", "runtime", "copilot-api", "operation-semantics.json");
 const GRAPHQL_URL = "https://app.copilot.money/api/graphql";
 const TOKEN_URL = "https://securetoken.googleapis.com/v1/token";
 
@@ -16,7 +17,7 @@ function printHelp() {
   console.log(`copilot-gql: run Copilot Money GraphQL operations
 
 Usage:
-  copilot-gql list
+  copilot-gql list [--descriptions]
   copilot-gql show <OperationName>
   copilot-gql run <OperationName> [--vars-json '<json>' | --vars-file <file>] [--operation-name <name>]
   copilot-gql raw --query-file <file> [--vars-json '<json>' | --vars-file <file>] [--operation-name <name>]
@@ -25,6 +26,7 @@ Usage:
 
 Examples:
   copilot-gql list
+  copilot-gql list --descriptions
   copilot-gql show TransactionsFeed
   copilot-gql run TransactionsFeed
   copilot-gql run TransactionSummary --vars-json '{"filter":{}}'
@@ -120,16 +122,56 @@ function loadQueryFromFile(fp) {
   return fs.readFileSync(full, "utf8");
 }
 
-function listOperations() {
+function loadSemanticsRegistry() {
+  if (!fs.existsSync(SEMANTICS_PATH)) return null;
+  try {
+    return JSON.parse(fs.readFileSync(SEMANTICS_PATH, "utf8"));
+  } catch {
+    return null;
+  }
+}
+
+function listOperations(showDescriptions = false) {
   if (!fs.existsSync(OPERATIONS_DIR)) {
     fail(`operations directory not found: ${OPERATIONS_DIR}`);
   }
+  const semantics = showDescriptions ? loadSemanticsRegistry() : null;
   const ops = fs
     .readdirSync(OPERATIONS_DIR)
     .filter((f) => f.endsWith(".graphql"))
     .map((f) => f.replace(/\.graphql$/, ""))
     .sort((a, b) => a.localeCompare(b));
-  for (const op of ops) console.log(op);
+  for (const op of ops) {
+    if (!showDescriptions) {
+      console.log(op);
+      continue;
+    }
+    const desc = semantics?.operations?.[op]?.description || "";
+    if (desc) {
+      console.log(`${op}\t${desc}`);
+    } else {
+      console.log(op);
+    }
+  }
+}
+
+function printSemantics(op) {
+  const semantics = loadSemanticsRegistry();
+  const entry = semantics?.operations?.[op];
+  if (!entry) return;
+
+  if (entry.description) {
+    console.log(`description: ${entry.description}`);
+  }
+  if (Array.isArray(entry.good_for) && entry.good_for.length > 0) {
+    console.log("good_for:");
+    for (const item of entry.good_for) {
+      console.log(`  - ${item}`);
+    }
+  }
+  if (Array.isArray(entry.related) && entry.related.length > 0) {
+    console.log(`related: ${entry.related.join(", ")}`);
+  }
 }
 
 function showOperation(op) {
@@ -148,6 +190,7 @@ function showOperation(op) {
     console.log("request_file: (none)");
     console.log("variables: {}");
   }
+  printSemantics(op);
   printEnumHints(query);
   console.log("query:");
   console.log(query);
@@ -271,7 +314,7 @@ async function main() {
   }
 
   if (cmd === "list") {
-    listOperations();
+    listOperations(Boolean(args.descriptions));
     return;
   }
 
