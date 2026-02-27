@@ -6,9 +6,9 @@ import process from "node:process";
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const ENV_PATH = path.join(ROOT, ".env");
-const OPERATIONS_DIR = path.join(ROOT, "references", "copilot-api", "operations");
-const REQUESTS_DIR = path.join(ROOT, "references", "copilot-api", "examples", "requests");
-const ENUM_VALUES_PATH = path.join(ROOT, "references", "copilot-api", "enum-values.json");
+const OPERATIONS_DIR = path.join(ROOT, "references", "runtime", "copilot-api", "operations");
+const REQUESTS_DIR = path.join(ROOT, "references", "runtime", "copilot-api", "examples", "requests");
+const ENUM_VALUES_PATH = path.join(ROOT, "references", "runtime", "copilot-api", "enum-values.json");
 const GRAPHQL_URL = "https://app.copilot.money/api/graphql";
 const TOKEN_URL = "https://securetoken.googleapis.com/v1/token";
 
@@ -28,7 +28,7 @@ Examples:
   copilot-gql show TransactionsFeed
   copilot-gql run TransactionsFeed
   copilot-gql run TransactionSummary --vars-json '{"filter":{}}'
-  copilot-gql raw --query-file ./references/copilot-api/operations/Tags.graphql --vars-file ./references/copilot-api/examples/requests/Tags.request.json
+  copilot-gql raw --query-file ./references/runtime/copilot-api/operations/Tags.graphql --vars-file ./references/runtime/copilot-api/examples/requests/Tags.request.json
 `);
 }
 

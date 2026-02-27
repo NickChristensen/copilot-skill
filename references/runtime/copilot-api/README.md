@@ -27,7 +27,7 @@ Captured from a logged-in production session on 2026-02-27 while navigating:
 
 Raw traffic file:
 
-- `../copilot-captured-graphql-ops.raw.json`
+- `../../capture/copilot-captured-graphql-ops.raw.json`
 
 ## Observed operations (22)
 

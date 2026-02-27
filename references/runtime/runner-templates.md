@@ -16,8 +16,8 @@ Use raw mode when needed:
 
 ```bash
 node scripts/copilot-gql.mjs raw \
-  --query-file references/copilot-api/operations/Tags.graphql \
-  --vars-file references/copilot-api/examples/requests/Tags.request.json \
+  --query-file references/runtime/copilot-api/operations/Tags.graphql \
+  --vars-file references/runtime/copilot-api/examples/requests/Tags.request.json \
   --operation-name Tags \
   | jq
 ```

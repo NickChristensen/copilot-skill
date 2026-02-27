@@ -27,12 +27,12 @@ node scripts/copilot-gql.mjs show AggregatedHoldings
 
 ## Canonical Inputs
 
-- Operation catalog: `references/copilot-api/copilot-api.operations.yaml`
-- Auth spec: `references/copilot-api/copilot-auth.yaml`
-- Enum candidates: `references/copilot-api/enum-values.json`
-- Query documents: `references/copilot-api/operations/*.graphql`
-- Example requests: `references/copilot-api/examples/requests/*.request.json`
-- Raw capture log: `references/copilot-captured-graphql-ops.raw.json`
+- Operation catalog: `references/runtime/copilot-api/copilot-api.operations.yaml`
+- Auth spec: `references/runtime/copilot-api/copilot-auth.yaml`
+- Enum candidates: `references/runtime/copilot-api/enum-values.json`
+- Query documents: `references/runtime/copilot-api/operations/*.graphql`
+- Example requests: `references/runtime/copilot-api/examples/requests/*.request.json`
+- Raw capture log: `references/capture/copilot-captured-graphql-ops.raw.json`
 
 ## Execute Known Operations
 
@@ -40,8 +40,8 @@ Use request examples to avoid reconstructing variables manually:
 
 ```bash
 node scripts/copilot-gql.mjs run Tags | jq
-node scripts/copilot-gql.mjs run Account --vars-file references/copilot-api/examples/requests/Account.request.json | jq
-node scripts/copilot-gql.mjs raw --query-file references/copilot-api/operations/Transactions.graphql --vars-file references/copilot-api/examples/requests/Transactions.request.json | jq
+node scripts/copilot-gql.mjs run Account --vars-file references/runtime/copilot-api/examples/requests/Account.request.json | jq
+node scripts/copilot-gql.mjs raw --query-file references/runtime/copilot-api/operations/Transactions.graphql --vars-file references/runtime/copilot-api/examples/requests/Transactions.request.json | jq
 ```
 
 ## Capture Expansion Workflow
@@ -52,10 +52,10 @@ When asked to discover new operations:
 2. Diff new captured traffic against the previous baseline.
 3. Extract new `operationName`, `query`, and variable patterns.
 4. Update:
-- `references/copilot-captured-graphql-ops.raw.json`
-- `references/copilot-api/operations/*.graphql`
-- `references/copilot-api/copilot-api.operations.yaml`
-- `references/copilot-api/examples/requests/*.request.json`
+- `references/capture/copilot-captured-graphql-ops.raw.json`
+- `references/runtime/copilot-api/operations/*.graphql`
+- `references/runtime/copilot-api/copilot-api.operations.yaml`
+- `references/runtime/copilot-api/examples/requests/*.request.json`
 
 ## Safety Rules
 
@@ -66,5 +66,6 @@ When asked to discover new operations:
 
 ## References
 
-- Operation groups and exploration order: `references/operation-groups.md`
-- Reusable runner templates: `references/runner-templates.md`
+- Folder guide: `references/README.md`
+- Operation groups and exploration order: `references/runtime/operation-groups.md`
+- Reusable runner templates: `references/runtime/runner-templates.md`

@@ -1,7 +1,0 @@
-{
-  "operationName": "Institution",
-  "variables": {
-    "id": "ins_129417"
-  },
-  "query_ref": "../operations/Institution.graphql"
-}
