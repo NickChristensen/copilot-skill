@@ -5,7 +5,7 @@ graphql:
   endpoint: https://app.copilot.money/api/graphql
   auth: ./copilot-auth.yaml
 capture:
-  source_file: ../../capture/copilot-captured-graphql-ops.raw.json
+  source_file: local-only browser capture (not committed)
   total_requests: 101
 
 operations:

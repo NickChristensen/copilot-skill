@@ -18,7 +18,5 @@ Use these files for normal API work:
 
 Use these files when discovering new operations or validating drift:
 
-- `capture/copilot-captured-graphql-ops.raw.json`
-- `capture/copilot-captured-graphql-ops.json`
 - `capture/copilot-api-auth-spec-prod.md`
 - `capture/README.md`

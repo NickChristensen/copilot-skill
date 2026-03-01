@@ -36,7 +36,7 @@ node scripts/copilot-gql.mjs show AggregatedHoldings
 - Use-case recipes: `references/runtime/copilot-api/use-cases.md`
 - Query documents: `references/runtime/copilot-api/operations/*.graphql`
 - Example requests: `references/runtime/copilot-api/examples/requests/*.request.json`
-- Raw capture log: `references/capture/copilot-captured-graphql-ops.raw.json`
+- Capture workflow notes: `references/capture/README.md`
 
 ## Execute Known Operations
 
@@ -64,7 +64,7 @@ When asked to discover new operations:
 3. Extract new `operationName`, `query`, and variable patterns.
 4. Update:
 
-- `references/capture/copilot-captured-graphql-ops.raw.json`
+- fresh browser-captured GraphQL traffic gathered during update work
 - `references/runtime/copilot-api/operations/*.graphql`
 - `references/runtime/copilot-api/copilot-api.operations.yaml`
 - `references/runtime/copilot-api/examples/requests/*.request.json`

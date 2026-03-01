@@ -27,9 +27,7 @@ Captured from a logged-in production session on 2026-02-27 while navigating:
 - Category detail
 - Recurring detail
 
-Raw traffic file:
-
-- `../../capture/copilot-captured-graphql-ops.raw.json`
+Raw traffic is intentionally not stored in the repo. Re-capture it locally when updating the catalog.
 
 ## Observed operations (22)
 
