@@ -157,3 +157,19 @@ When asked to discover new operations:
 - Folder guide: `references/README.md`
 - Operation groups and exploration order: `references/runtime/operation-groups.md`
 - Reusable runner templates: `references/runtime/runner-templates.md`
+
+## Transaction Hydration & Cache
+
+Transactions return `accountId` and `categoryId` as opaque IDs — not human-readable names.
+Before presenting transaction data to the user, hydrate these IDs using the local cache:
+
+```
+cache/accounts.json       — id → {name, type, subType, mask}
+cache/categories.json     — id → {name, parentId, parentName}
+cache/category-tree.json  — id → {name, children: [{id, name}]}
+```
+
+If the cache files don't exist, run `node scripts/sync-cache.mjs` first.
+
+For worked examples, rollup patterns, and known API quirks discovered at runtime, see:
+→ **`AGENT-NOTES.md`** in this skill's root directory.
