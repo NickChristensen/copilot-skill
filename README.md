@@ -20,6 +20,38 @@ It is not meant to teach financial analysis, planning, or advice. The intended w
 - [references/runtime/copilot-api](/Users/nick/code/copilot.money/references/runtime/copilot-api): operation catalog, GraphQL documents, example requests, and use-case recipes
 - [references/capture](/Users/nick/code/copilot.money/references/capture): lower-level capture artifacts used to expand the known API surface
 
+## Obtaining Your Credentials
+
+To use this project, you will need `COPILOT_API_KEY` and `COPILOT_REFRESH_TOKEN` from an authenticated Copilot web session. You can obtain both with Chrome DevTools.
+
+### Get `COPILOT_REFRESH_TOKEN`
+
+1. Open Copilot in Chrome and log in.
+2. Open DevTools.
+3. Go to `Application` -> `IndexedDB` -> `firebaseLocalStorageDb` -> `firebaseLocalStorage`.
+4. Open the row with key like `firebase:authUser:<apiKey>:[DEFAULT]`.
+5. Copy `stsTokenManager.refreshToken`.
+
+### Get `COPILOT_API_KEY`
+
+1. In that same IndexedDB row, inspect the key:
+   `firebase:authUser:<apiKey>:[DEFAULT]`
+2. The middle segment is the Firebase API key, usually starting with `AIza...`.
+
+You can also get `COPILOT_API_KEY` from DevTools `Network` by finding a request to either:
+
+- `https://identitytoolkit.googleapis.com/...?...key=...`
+- `https://securetoken.googleapis.com/v1/token?key=...`
+
+Then copy the `key` query parameter.
+
+### Sanity Check
+
+- `COPILOT_API_KEY` usually starts with `AIza...`
+- `COPILOT_REFRESH_TOKEN` is a long opaque string, often starting with `AMf-...`
+
+Treat both values as secrets.
+
 ## In Scope
 
 - retrieving balances and account histories
