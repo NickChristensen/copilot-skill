@@ -59,8 +59,8 @@ function parseDotEnv(file) {
 
 function loadEnv() {
   const parsed = parseDotEnv(ENV_PATH);
-  if (!process.env.API_KEY && parsed.API_KEY) process.env.API_KEY = parsed.API_KEY;
-  if (!process.env.REFRESH_TOKEN && parsed.REFRESH_TOKEN) process.env.REFRESH_TOKEN = parsed.REFRESH_TOKEN;
+  if (!process.env.COPILOT_API_KEY && parsed.COPILOT_API_KEY) process.env.COPILOT_API_KEY = parsed.COPILOT_API_KEY;
+  if (!process.env.COPILOT_REFRESH_TOKEN && parsed.COPILOT_REFRESH_TOKEN) process.env.COPILOT_REFRESH_TOKEN = parsed.COPILOT_REFRESH_TOKEN;
 }
 
 function parseArgs(argv) {
@@ -255,10 +255,10 @@ function printEnumHints(query) {
 }
 
 async function refreshIdToken() {
-  const apiKey = process.env.API_KEY;
-  const refreshToken = process.env.REFRESH_TOKEN;
+  const apiKey = process.env.COPILOT_API_KEY;
+  const refreshToken = process.env.COPILOT_REFRESH_TOKEN;
   if (!apiKey || !refreshToken) {
-    fail("missing API_KEY or REFRESH_TOKEN (set env vars or .env)");
+    fail("missing COPILOT_API_KEY or COPILOT_REFRESH_TOKEN (set env vars or .env)");
   }
 
   const body = new URLSearchParams({

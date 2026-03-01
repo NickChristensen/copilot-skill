@@ -10,12 +10,12 @@ firebase_secure_token:
   endpoint: https://securetoken.googleapis.com/v1/token
   method: POST
   query:
-    key: "${API_KEY}"
+    key: "${COPILOT_API_KEY}"
   headers:
     content-type: application/x-www-form-urlencoded
   body_form:
     grant_type: refresh_token
-    refresh_token: "${REFRESH_TOKEN}"
+    refresh_token: "${COPILOT_REFRESH_TOKEN}"
   success_fields:
     - id_token
     - refresh_token

@@ -24,10 +24,10 @@ Audience: engineers building a production-quality Copilot client.
 Use the Firebase Secure Token API to exchange a refresh token for a new ID token:
 
 ```
-POST https://securetoken.googleapis.com/v1/token?key=<API_KEY>
+POST https://securetoken.googleapis.com/v1/token?key=<COPILOT_API_KEY>
 content-type: application/x-www-form-urlencoded
 
-grant_type=refresh_token&refresh_token=<REFRESH_TOKEN>
+grant_type=refresh_token&refresh_token=<COPILOT_REFRESH_TOKEN>
 ```
 
 Response fields:

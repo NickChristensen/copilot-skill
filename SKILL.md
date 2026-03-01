@@ -133,7 +133,7 @@ node scripts/copilot-gql.mjs raw --query-file references/runtime/copilot-api/ope
 - Never print token values.
 - Never commit unredacted secrets or raw authorization headers.
 - Redact account IDs, item IDs, and security IDs in shared examples unless explicitly asked to keep them.
-- Treat `.env` as source-only for `API_KEY` and `REFRESH_TOKEN`; do not cat the file contents.
+- Treat `.env` as source-only for `COPILOT_API_KEY` and `COPILOT_REFRESH_TOKEN`; do not cat the file contents.
 - Never guess category IDs, security IDs, or institution mappings.
 - Never mix retrieved facts with advice as if Copilot returned the advice.
 - Never claim complete net-worth coverage unless the retrieved operations actually cover all relevant account classes.
