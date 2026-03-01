@@ -15,10 +15,12 @@ It is not meant to teach financial analysis, planning, or advice. The intended w
 
 ## What's Here
 
-- [SKILL.md](/Users/nick/code/copilot.money/SKILL.md): the main skill instructions for agents
-- [scripts/copilot-gql.mjs](/Users/nick/code/copilot.money/scripts/copilot-gql.mjs): local runner for captured GraphQL operations
-- [references/runtime/copilot-api](/Users/nick/code/copilot.money/references/runtime/copilot-api): operation catalog, GraphQL documents, example requests, and use-case recipes
-- [references/capture](/Users/nick/code/copilot.money/references/capture): lower-level capture artifacts used to expand the known API surface
+Paths below are **relative to the skill root** (aka `{baseDir}`):
+
+- [`SKILL.md`](./SKILL.md): the main skill instructions for agents
+- [`scripts/copilot-gql.mjs`](./scripts/copilot-gql.mjs): local runner for captured GraphQL operations
+- [`references/runtime/copilot-api`](./references/runtime/copilot-api): operation catalog, GraphQL documents, example requests, and use-case recipes
+- [`references/capture`](./references/capture): lower-level capture artifacts used to expand the known API surface
 
 ## Obtaining Your Credentials
 
