@@ -1,1 +1,8 @@
 .env
+
+# Generated / local-only data
+cache/
+.cache/
+
+# macOS
+.DS_Store
