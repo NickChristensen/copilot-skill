@@ -1,7 +1,15 @@
 {
   "operationName": "TransactionSummary",
   "variables": {
-    "filter": {}
+    "filter": {
+      "isExcludedCategory": false,
+      "dates": [
+        {
+          "start": 1769925600,
+          "end": 1772344799
+        }
+      ]
+    }
   },
   "query_ref": "../../operations/TransactionSummary.graphql"
 }

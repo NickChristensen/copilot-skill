@@ -147,9 +147,10 @@
       "related": ["InvestmentBalance", "Holdings", "AggregatedHoldings"]
     },
     "TransactionSummary": {
-      "description": "Return aggregate transaction totals/counts for a filter.",
+      "description": "Return aggregate transaction totals/counts for a filter, including observed date-range filters via filter.dates.",
       "good_for": [
-        "Fast aggregate metrics for searches and scoped filters"
+        "Fast aggregate metrics for searches and scoped filters",
+        "Date-range scoped transaction totals"
       ],
       "related": ["TransactionsFeed", "Transactions"]
     },
@@ -161,10 +162,11 @@
       "related": ["TransactionSummary", "MostRecentTransaction"]
     },
     "TransactionsFeed": {
-      "description": "Return feed-style paginated transactions, with optional month-group nodes.",
+      "description": "Return feed-style paginated transactions, optionally grouped by month, with observed date-range filters via filter.dates.",
       "good_for": [
         "General transaction browsing",
-        "Search/category/account scoped transaction feeds"
+        "Search/category/account scoped transaction feeds",
+        "Date-range scoped transaction browsing"
       ],
       "related": ["TransactionSummary", "Transactions"]
     }

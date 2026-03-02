@@ -126,8 +126,8 @@ Needed data:
 - aggregate totals for the search scope
 
 ```bash
-node scripts/copilot-gql.mjs run TransactionsFeed --vars-json '{"month":true,"filter":{"matchString":"costco"},"sort":[{"direction":"DESC","field":"DATE"}],"first":25}' | jq
-node scripts/copilot-gql.mjs run TransactionSummary --vars-json '{"filter":{"matchString":"costco"}}' | jq
+node scripts/copilot-gql.mjs run TransactionsFeed --vars-json '{"filter":{"matchString":"costco","dates":[{"start":1769925600,"end":1772344799}]},"sort":[{"direction":"DESC","field":"DATE"}],"first":25}' | jq
+node scripts/copilot-gql.mjs run TransactionSummary --vars-json '{"filter":{"matchString":"costco","dates":[{"start":1769925600,"end":1772344799}]}}' | jq
 ```
 
 Retrieval notes:
@@ -135,6 +135,8 @@ Retrieval notes:
 - `TransactionsFeed` is the evidence set.
 - `TransactionSummary` is the fast aggregate.
 - Merchant search works well here.
+- Observed server-side date scoping uses `filter.dates`, where each range is `{ "start": <unix_seconds>, "end": <unix_seconds> }`.
+- `month: true` on `TransactionsFeed` is optional and affects month-grouped feed output, not the date-range filter itself.
 
 ## 6) Category Detail Drilldown
 

@@ -2,7 +2,15 @@
   "operationName": "TransactionsFeed",
   "variables": {
     "month": true,
-    "filter": null,
+    "filter": {
+      "isExcludedCategory": false,
+      "dates": [
+        {
+          "start": 1769925600,
+          "end": 1772344799
+        }
+      ]
+    },
     "sort": [
       {
         "direction": "DESC",
