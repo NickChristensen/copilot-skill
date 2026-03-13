@@ -64,7 +64,13 @@ const total = transactions
 - `category { name }` is a valid field but the default `CategoryKeyMetrics` query doesn't
   request it. Add it manually when needed.
 - `TransactionsFeed` default vars include `"month": true` which injects `TransactionMonth`
-  group nodes. Pass `"month": false` to get a clean list of transactions only.
+  group nodes. Pass `"month": false` to get a clean list of transactions only, but for
+  review-state workflows prefer `Transactions` because it returns a plain transaction list.
+- `Transactions` accepts a server-side review-state filter via `filter.isReviewed`.
+  - Example unreviewed query:
+    `node scripts/copilot-gql.mjs run Transactions --vars-json '{"filter":{"isReviewed":false},"sort":[{"direction":"DESC","field":"DATE"}],"first":100}' | jq`
+  - For presentation, hydrate `accountId` / `categoryId` through `cache/accounts.json` and
+    `cache/categories.json`.
 - `Accounts` default vars filter to `"type": "INVESTMENT"`. Pass `"filter": null` to get
   all account types.
 - `raw` command requires `--operation-name` to match the query's operation name, otherwise
