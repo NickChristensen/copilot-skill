@@ -1,0 +1,47 @@
+{
+  "operationName": "EditTransaction",
+  "observed_examples": [
+    {
+      "label": "mark_reviewed",
+      "variables": {
+        "accountId": "<account_id>",
+        "itemId": "<item_id>",
+        "id": "<transaction_id>",
+        "input": {
+          "isReviewed": true
+        }
+      }
+    },
+    {
+      "label": "change_category",
+      "variables": {
+        "accountId": "<account_id>",
+        "itemId": "<item_id>",
+        "id": "<transaction_id>",
+        "input": {
+          "categoryId": "<category_id>"
+        }
+      }
+    },
+    {
+      "label": "rename_transaction",
+      "variables": {
+        "accountId": "<account_id>",
+        "itemId": "<item_id>",
+        "id": "<transaction_id>",
+        "input": {
+          "name": "<new_name>"
+        }
+      }
+    }
+  ],
+  "variables": {
+    "accountId": "<account_id>",
+    "itemId": "<item_id>",
+    "id": "<transaction_id>",
+    "input": {
+      "isReviewed": true
+    }
+  },
+  "query_ref": "../../operations/EditTransaction.graphql"
+}

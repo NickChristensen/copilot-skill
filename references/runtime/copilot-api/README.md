@@ -29,7 +29,7 @@ Captured from a logged-in production session on 2026-02-27 while navigating:
 
 Raw traffic is intentionally not stored in the repo. Re-capture it locally when updating the catalog.
 
-## Observed operations (22)
+## Observed operations (24)
 
 - `Account`
 - `AccountLiveBalance`
@@ -37,8 +37,10 @@ Raw traffic is intentionally not stored in the repo. Re-capture it locally when 
 - `AggregatedHoldings`
 - `AmountTotalMonthly`
 - `BalanceHistory`
+- `BulkEditTransactions`
 - `CategoryKeyMetrics`
 - `CategoryTotalKeyMetrics`
+- `EditTransaction`
 - `Holdings`
 - `Institution`
 - `InvestmentAllocation`
@@ -65,6 +67,18 @@ Raw traffic is intentionally not stored in the repo. Re-capture it locally when 
   - `Recurrings`
   - `RecurringKeyMetrics`
   - `MostRecentTransaction`
+  - `EditTransaction`
+
+## Mutation findings
+
+- First captured transaction mutations:
+  - `EditTransaction` for single-transaction review state changes
+  - `BulkEditTransactions` for multi-transaction review state changes
+- Both review paths set `input.isReviewed` and identify transactions using `accountId`, `itemId`, and `id`.
+- `EditTransaction` also handles observed single-transaction category changes via `input.categoryId`.
+- `EditTransaction` also handles observed single-transaction renames via `input.name`.
+- `BulkEditTransactions` also handles observed bulk category changes via `input.categoryId`.
+- Observed bulk category changes scoped the selected set with both `filter.ids` and `filter.categoryIds`.
 
 ## Maintenance workflow
 

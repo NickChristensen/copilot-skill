@@ -1,0 +1,59 @@
+{
+  "operationName": "BulkEditTransactions",
+  "observed_examples": [
+    {
+      "label": "mark_reviewed",
+      "variables": {
+        "input": {
+          "isReviewed": true
+        },
+        "filter": {
+          "isReviewed": false,
+          "ids": [
+            {
+              "accountId": "<account_id>",
+              "itemId": "<item_id>",
+              "id": "<transaction_id>"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "label": "change_category",
+      "variables": {
+        "input": {
+          "categoryId": "<new_category_id>"
+        },
+        "filter": {
+          "categoryIds": [
+            "<old_category_id>"
+          ],
+          "ids": [
+            {
+              "accountId": "<account_id>",
+              "itemId": "<item_id>",
+              "id": "<transaction_id>"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "variables": {
+    "input": {
+      "isReviewed": true
+    },
+    "filter": {
+      "isReviewed": false,
+      "ids": [
+        {
+          "accountId": "<account_id>",
+          "itemId": "<item_id>",
+          "id": "<transaction_id>"
+        }
+      ]
+    }
+  },
+  "query_ref": "../../operations/BulkEditTransactions.graphql"
+}

@@ -7,6 +7,7 @@ Use these recipes to translate common finance questions into Copilot data retrie
 - If a query needs `accountId`, `itemId`, `institutionId`, `securityId`, `categoryId`, or `recurringId`, discover it first instead of guessing.
 - If the user asks for a category by plain-English name, be explicit that category-name lookup is not yet captured in the API artifacts.
 - If the user asks for "net worth," verify whether they really mean investment portfolio value, one account's balance, or true cross-account net worth.
+- Confirm with the user before running mutations that change live Copilot data.
 - Stop after data retrieval. Use another skill for financial analysis, recommendations, planning, or scenario modeling.
 
 ## 1) Discover Account IDs For A Provider Or Brokerage (e.g., E-Trade)
@@ -270,7 +271,53 @@ Important limitation:
 - If the user truly means total net worth, say that the captured API only directly supports investment balance plus individual account histories.
 - Retrieve the closest supported series and let another skill interpret it.
 
-## 12) Retirement Scenarios
+Retrieval notes:
+
+- This is usually a portfolio proxy, not true full net worth unless you separately include non-investment accounts and liabilities.
+
+## 12) Edit Or Organize Transactions
+
+Question shape:
+
+- "mark this transaction reviewed"
+- "mark these three transactions as reviewed"
+- "move this transaction to Bars & Nightlife"
+- "move these two transactions to Car Payment"
+- "rename this Apple transaction"
+
+Needed data:
+
+- one or more transaction identifiers
+- `accountId`, `itemId`, and transaction `id` for each targeted transaction
+- target `categoryId` if changing category
+- current `old_category_id` when doing an observed bulk category change
+- replacement `name` if renaming
+
+Single transaction:
+
+```bash
+node scripts/copilot-gql.mjs run EditTransaction --vars-json '{"accountId":"<account_id>","itemId":"<item_id>","id":"<transaction_id>","input":{"isReviewed":true}}' | jq
+node scripts/copilot-gql.mjs run EditTransaction --vars-json '{"accountId":"<account_id>","itemId":"<item_id>","id":"<transaction_id>","input":{"categoryId":"<category_id>"}}' | jq
+node scripts/copilot-gql.mjs run EditTransaction --vars-json '{"accountId":"<account_id>","itemId":"<item_id>","id":"<transaction_id>","input":{"name":"<new_name>"}}' | jq
+```
+
+Bulk transaction set:
+
+```bash
+node scripts/copilot-gql.mjs run BulkEditTransactions --vars-json '{"input":{"isReviewed":true},"filter":{"isReviewed":false,"ids":[{"accountId":"<account_id>","itemId":"<item_id>","id":"<transaction_id>"}]}}' | jq
+node scripts/copilot-gql.mjs run BulkEditTransactions --vars-json '{"input":{"categoryId":"<new_category_id>"},"filter":{"categoryIds":["<old_category_id>"],"ids":[{"accountId":"<account_id>","itemId":"<item_id>","id":"<transaction_id>"}]}}' | jq
+```
+
+Retrieval notes:
+
+- `EditTransaction` is the single-record mutation.
+- `BulkEditTransactions` applies the same update across a selected transaction set.
+- Observed `EditTransaction` inputs include `isReviewed`, `categoryId`, and `name`.
+- Observed `BulkEditTransactions` inputs include `isReviewed` and `categoryId`.
+- Observed bulk review uses `filter.isReviewed` plus `filter.ids`.
+- Observed bulk category changes use both `filter.ids` and `filter.categoryIds`.
+
+## 13) Retirement Scenarios
 
 Question shape:
 

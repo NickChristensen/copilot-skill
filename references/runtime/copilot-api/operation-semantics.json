@@ -63,6 +63,25 @@
       ],
       "related": ["CategoryKeyMetrics"]
     },
+    "BulkEditTransactions": {
+      "description": "Bulk update transactions matching a TransactionFilter, including bulk review-state and category changes.",
+      "good_for": [
+        "Mark several transactions reviewed in one mutation",
+        "Move several transactions to a new category in one mutation",
+        "Apply the same transaction edit across a selected transaction set"
+      ],
+      "related": ["EditTransaction", "TransactionSummary", "TransactionsFeed"]
+    },
+    "EditTransaction": {
+      "description": "Update a single transaction by itemId, accountId, and transaction id.",
+      "good_for": [
+        "Mark one transaction reviewed",
+        "Change a transaction category",
+        "Rename a transaction",
+        "Apply a targeted edit to one known transaction"
+      ],
+      "related": ["BulkEditTransactions", "Transaction", "TransactionsFeed"]
+    },
     "Holdings": {
       "description": "Return raw holdings positions with security and metrics fields.",
       "good_for": [

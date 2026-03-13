@@ -33,6 +33,10 @@ operations:
     type: query
     query_file: ./operations/BalanceHistory.graphql
     request_example: ./examples/requests/BalanceHistory.request.json
+  - name: BulkEditTransactions
+    type: mutation
+    query_file: ./operations/BulkEditTransactions.graphql
+    request_example: ./examples/requests/BulkEditTransactions.request.json
   - name: CategoryKeyMetrics
     type: query
     query_file: ./operations/CategoryKeyMetrics.graphql
@@ -41,6 +45,10 @@ operations:
     type: query
     query_file: ./operations/CategoryTotalKeyMetrics.graphql
     request_example: ./examples/requests/CategoryTotalKeyMetrics.request.json
+  - name: EditTransaction
+    type: mutation
+    query_file: ./operations/EditTransaction.graphql
+    request_example: ./examples/requests/EditTransaction.request.json
   - name: Holdings
     type: query
     query_file: ./operations/Holdings.graphql
