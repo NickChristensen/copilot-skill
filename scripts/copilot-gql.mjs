@@ -8,6 +8,7 @@ const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..")
 const ENV_PATH = path.join(ROOT, ".env");
 const OPERATIONS_DIR = path.join(ROOT, "references", "runtime", "copilot-api", "operations");
 const REQUESTS_DIR = path.join(ROOT, "references", "runtime", "copilot-api", "examples", "requests");
+const CACHE_DIR = path.join(ROOT, "cache");
 const ENUM_VALUES_PATH = path.join(ROOT, "references", "runtime", "copilot-api", "enum-values.json");
 const SEMANTICS_PATH = path.join(ROOT, "references", "runtime", "copilot-api", "operation-semantics.json");
 const GRAPHQL_URL = "https://app.copilot.money/api/graphql";
@@ -19,8 +20,8 @@ function printHelp() {
 Usage:
   copilot-gql list [--descriptions]
   copilot-gql show <OperationName>
-  copilot-gql run <OperationName> [--vars-json '<json>' | --vars-file <file>] [--operation-name <name>]
-  copilot-gql raw --query-file <file> [--vars-json '<json>' | --vars-file <file>] [--operation-name <name>]
+  copilot-gql run <OperationName> [--vars-json '<json>' | --vars-file <file>] [--operation-name <name>] [--no-hydrate]
+  copilot-gql raw --query-file <file> [--vars-json '<json>' | --vars-file <file>] [--operation-name <name>] [--no-hydrate]
   copilot-gql token
   copilot-gql help
 
@@ -29,6 +30,7 @@ Examples:
   copilot-gql list --descriptions
   copilot-gql show TransactionsFeed
   copilot-gql run TransactionsFeed
+  copilot-gql run TransactionsFeed --no-hydrate
   copilot-gql run TransactionSummary --vars-json '{"filter":{}}'
   copilot-gql raw --query-file ./references/runtime/copilot-api/operations/Tags.graphql --vars-file ./references/runtime/copilot-api/examples/requests/Tags.request.json
 `);
@@ -254,6 +256,98 @@ function printEnumHints(query) {
   }
 }
 
+function loadCache() {
+  const accountsPath = path.join(CACHE_DIR, "accounts.json");
+  const categoriesPath = path.join(CACHE_DIR, "categories.json");
+  const recurringsPath = path.join(CACHE_DIR, "recurrings.json");
+
+  const missing = [];
+  if (!fs.existsSync(accountsPath)) missing.push("accounts.json");
+  if (!fs.existsSync(categoriesPath)) missing.push("categories.json");
+  if (!fs.existsSync(recurringsPath)) missing.push("recurrings.json");
+
+  if (missing.length > 0) {
+    fail(
+      `Cache files missing: ${missing.join(", ")}.\n` +
+      `Run: node scripts/sync-cache.mjs\n` +
+      `Then retry your command.`
+    );
+  }
+
+  const accounts = JSON.parse(fs.readFileSync(accountsPath, "utf8"));
+  const categories = JSON.parse(fs.readFileSync(categoriesPath, "utf8"));
+  const recurrings = JSON.parse(fs.readFileSync(recurringsPath, "utf8"));
+
+  return { accounts, categories, recurrings };
+}
+
+function hydrateTransaction(tx, { accounts, categories, recurrings }) {
+  const hydrated = { ...tx };
+
+  // Hydrate account name
+  if (tx.accountId) {
+    if (accounts[tx.accountId]) {
+      hydrated.accountName = accounts[tx.accountId].name;
+    } else {
+      console.error(`⚠️  Missing cache key: accountId "${tx.accountId}". Run: node scripts/sync-cache.mjs`);
+    }
+  }
+
+  // Hydrate category display with emoji
+  if (tx.categoryId) {
+    if (categories[tx.categoryId]) {
+      const { emoji, name } = categories[tx.categoryId];
+      hydrated.categoryDisplay = `${emoji || ""} ${name}`;
+    } else {
+      console.error(`⚠️  Missing cache key: categoryId "${tx.categoryId}". Run: node scripts/sync-cache.mjs`);
+    }
+  }
+
+  // Hydrate display name from recurring
+  if (tx.recurringId) {
+    if (recurrings[tx.recurringId]) {
+      const {emoji, name} = recurrings[tx.recurringId];
+      hydrated.displayName = `${emoji} ${name} (${tx.name})`;
+    } else {
+      console.error(`⚠️  Missing cache key: recurringId "${tx.recurringId}". Run: node scripts/sync-cache.mjs`);
+      hydrated.displayName = tx.name;
+    }
+  } else {
+    hydrated.displayName = tx.name;
+  }
+
+  return hydrated;
+}
+
+function isTransaction(obj) {
+  return (
+    obj &&
+    typeof obj === "object" &&
+    typeof obj.id === "string" &&
+    typeof obj.accountId === "string" &&
+    typeof obj.categoryId === "string" &&
+    typeof obj.date === "string"
+  );
+}
+
+function hydrateResponse(data, cache) {
+  if (!data || typeof data !== "object") return data;
+
+  if (Array.isArray(data)) {
+    return data.map(item => hydrateResponse(item, cache));
+  }
+
+  if (isTransaction(data)) {
+    return hydrateTransaction(data, cache);
+  }
+
+  const result = {};
+  for (const [key, value] of Object.entries(data)) {
+    result[key] = hydrateResponse(value, cache);
+  }
+  return result;
+}
+
 async function refreshIdToken() {
   const apiKey = process.env.COPILOT_API_KEY;
   const refreshToken = process.env.COPILOT_REFRESH_TOKEN;
@@ -279,7 +373,7 @@ async function refreshIdToken() {
   return { idToken: json.id_token, expiresIn: json.expires_in };
 }
 
-async function executeGraphql({ operationName, query, variables }) {
+async function executeGraphql({ operationName, query, variables }, hydrate = true) {
   const { idToken } = await refreshIdToken();
   const res = await fetch(GRAPHQL_URL, {
     method: "POST",
@@ -294,7 +388,16 @@ async function executeGraphql({ operationName, query, variables }) {
   if (!res.ok) {
     fail(`graphql request failed (${res.status}): ${txt.slice(0, 500)}`);
   }
-  console.log(txt);
+
+  const data = JSON.parse(txt);
+
+  if (hydrate) {
+    const cache = loadCache();
+    const hydrated = hydrateResponse(data, cache);
+    console.log(JSON.stringify(hydrated, null, 2));
+  } else {
+    console.log(txt);
+  }
 }
 
 async function main() {
@@ -331,7 +434,7 @@ async function main() {
     const query = loadQueryFromOperation(op);
     const variables = loadVars(args, op);
     const operationName = String(args["operation-name"] || op);
-    await executeGraphql({ operationName, query, variables });
+    await executeGraphql({ operationName, query, variables }, !args["no-hydrate"]);
     return;
   }
 
@@ -341,7 +444,7 @@ async function main() {
     const query = loadQueryFromFile(String(queryFile));
     const variables = loadVars(args);
     const operationName = String(args["operation-name"] || "RawOperation");
-    await executeGraphql({ operationName, query, variables });
+    await executeGraphql({ operationName, query, variables }, !args["no-hydrate"]);
     return;
   }
 

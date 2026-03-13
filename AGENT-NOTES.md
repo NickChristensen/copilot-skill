@@ -7,31 +7,16 @@ Update this file as new patterns emerge.
 
 ## Cache Files
 
-Run `node scripts/sync-cache.mjs` to populate (or refresh) three lookup files in `cache/`:
+Run `node scripts/sync-cache.mjs` to populate (or refresh) four lookup files in `cache/`:
 
 | File | Contents |
 |------|----------|
 | `cache/accounts.json` | `id → {name, type, subType, mask}` — all 23 accounts across checking, credit, investment, mortgage, real estate |
-| `cache/categories.json` | `id → {name, parentId, parentName}` — all 34 categories (flat); subcategories include parent info for rollups |
-| `cache/category-tree.json` | `id → {name, children: [{id, name}]}` — top-level categories with subcategories nested |
+| `cache/categories.json` | `id → {name, parentId, parentName, emoji}` — all 34 categories (flat); subcategories include parent info for rollups |
+| `cache/category-tree.json` | `id → {name, emoji, children: [{id, name, emoji}]}` — top-level categories with subcategories nested |
+| `cache/recurrings.json` | `id → {name, emoji, frequency, amount, categoryId, state}` — all recurring payments with metadata |
 
 These change infrequently. Re-run sync when Nick adds a new account or changes categories.
-
-### Using the cache for transaction hydration
-
-Transactions from `TransactionsFeed` / `Transactions` return `accountId` and `categoryId` as
-opaque IDs. To get human-readable names, load the cache files and join:
-
-```js
-import fs from "node:fs";
-const accounts   = JSON.parse(fs.readFileSync("cache/accounts.json",   "utf8"));
-const categories = JSON.parse(fs.readFileSync("cache/categories.json", "utf8"));
-
-// Hydrate a transaction node:
-const account  = accounts[tx.accountId]?.name  ?? tx.accountId;
-const category = categories[tx.categoryId]?.name ?? "Uncategorized";
-const parent   = categories[tx.categoryId]?.parentName ?? null;
-```
 
 ### Category rollups
 
@@ -69,8 +54,7 @@ const total = transactions
 - `Transactions` accepts a server-side review-state filter via `filter.isReviewed`.
   - Example unreviewed query:
     `node scripts/copilot-gql.mjs run Transactions --vars-json '{"filter":{"isReviewed":false},"sort":[{"direction":"DESC","field":"DATE"}],"first":100}' | jq`
-  - For presentation, hydrate `accountId` / `categoryId` through `cache/accounts.json` and
-    `cache/categories.json`.
+  - Fields like `displayName`, `categoryDisplay`, and `accountName` are automatically augmented with cached data. Pass `--no-hydrate` to get raw output.
 - `Accounts` default vars filter to `"type": "INVESTMENT"`. Pass `"filter": null` to get
   all account types.
 - `raw` command requires `--operation-name` to match the query's operation name, otherwise

@@ -41,7 +41,7 @@ console.error(`  → ${Object.keys(accounts).length} accounts`);
 console.error("Fetching categories...");
 const CAT_QUERY = path.join(CACHE_DIR, "_cats.graphql");
 fs.writeFileSync(CAT_QUERY,
-  `query GetCategories {\n  categories {\n    id\n    name\n    childCategories { id name __typename }\n    __typename\n  }\n}`
+  `query GetCategories {\n  categories {\n    id\n    name\n    icon {\n      ... on EmojiUnicode {\n        unicode\n        __typename\n      }\n      __typename\n    }\n    childCategories {\n      id\n      name\n      icon {\n        ... on EmojiUnicode {\n          unicode\n          __typename\n        }\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n}`
 );
 const catResult = execFileSync(
   "node", [RUNNER, "raw", "--query-file", CAT_QUERY, "--operation-name", "GetCategories"],
@@ -51,29 +51,59 @@ fs.unlinkSync(CAT_QUERY);
 
 const rawCats = JSON.parse(catResult).data?.categories ?? [];
 
-// Flat map: id → {name, parentId, parentName}
+// Flat map: id → {name, parentId, parentName, emoji}
 const categories = {};
-// Tree map: id → {name, children: [{id, name}]}
+// Tree map: id → {name, emoji, children: [{id, name, emoji}]}
 const categoryTree = {};
 
 for (const cat of rawCats) {
   if (!cat.id || !cat.name) continue;
-  categories[cat.id] = { name: cat.name, parentId: null, parentName: null };
+  const parentEmoji = cat.icon?.unicode ?? null;
+  categories[cat.id] = { name: cat.name, parentId: null, parentName: null, emoji: parentEmoji };
   categoryTree[cat.id] = {
     name: cat.name,
-    children: (cat.childCategories ?? []).map(s => ({ id: s.id, name: s.name }))
+    emoji: parentEmoji,
+    children: (cat.childCategories ?? []).map(s => ({
+      id: s.id,
+      name: s.name,
+      emoji: s.icon?.unicode ?? null
+    }))
   };
   for (const sub of cat.childCategories ?? []) {
     if (sub.id && sub.name) {
-      categories[sub.id] = { name: sub.name, parentId: cat.id, parentName: cat.name };
+      categories[sub.id] = {
+        name: sub.name,
+        parentId: cat.id,
+        parentName: cat.name,
+        emoji: sub.icon?.unicode ?? null
+      };
     }
   }
 }
 console.error(`  → ${Object.keys(categories).length} categories (${rawCats.length} top-level)`);
 
+// ── Recurrings ─────────────────────────────────────────────────────────────────
+console.error("Fetching recurrings...");
+const recurringsData = run(["run", "Recurrings", "--vars-json", "{}"]);
+const recurrings = {};
+for (const r of recurringsData.data?.recurrings ?? []) {
+  if (r.id && r.name) {
+    recurrings[r.id] = {
+      name: r.name,
+      emoji: r.icon?.unicode,
+      frequency: r.frequency,
+      amount: r.nextPaymentAmount,
+      categoryId: r.categoryId,
+      state: r.state
+    };
+  }
+}
+console.error(`  → ${Object.keys(recurrings).length} recurrings`);
+
 // ── Write cache ───────────────────────────────────────────────────────────────
 fs.writeFileSync(path.join(CACHE_DIR, "accounts.json"), JSON.stringify(accounts, null, 2));
 fs.writeFileSync(path.join(CACHE_DIR, "categories.json"), JSON.stringify(categories, null, 2));
 fs.writeFileSync(path.join(CACHE_DIR, "category-tree.json"), JSON.stringify(categoryTree, null, 2));
-console.error("Cache written to cache/accounts.json, cache/categories.json, cache/category-tree.json");
+fs.writeFileSync(path.join(CACHE_DIR, "recurrings.json"), JSON.stringify(recurrings, null, 2));
+console.error("Cache written to cache/accounts.json, cache/categories.json, cache/category-tree.json, cache/recurrings.json");
 console.log(JSON.stringify({ accounts: Object.keys(accounts).length, categories: Object.keys(categories).length }));

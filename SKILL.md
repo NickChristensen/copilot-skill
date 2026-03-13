@@ -160,13 +160,20 @@ When asked to discover new operations:
 
 ## Transaction Hydration & Cache
 
-Transactions return `accountId` and `categoryId` as opaque IDs — not human-readable names.
-Before presenting transaction data to the user, hydrate these IDs using the local cache:
+Transactions return `accountId`, `categoryId`, and `recurringId` as opaque IDs — not human-readable names.
+Fields like `displayName`, `categoryDisplay`, and `accountName` are automatically augmented with cached data (see AGENT-NOTES.md). Pass `--no-hydrate` to disable this.
+
+```bash
+node scripts/copilot-gql.mjs run TransactionsFeed | jq
+node scripts/copilot-gql.mjs run Transactions --no-hydrate | jq
+```
+
+**Cache files used for hydration:**
 
 ```
 cache/accounts.json       — id → {name, type, subType, mask}
-cache/categories.json     — id → {name, parentId, parentName}
-cache/category-tree.json  — id → {name, children: [{id, name}]}
+cache/categories.json     — id → {name, parentId, parentName, emoji}
+cache/recurrings.json    — id → {name, emoji, frequency, amount, categoryId, state}
 ```
 
 If the cache files don't exist, run `node scripts/sync-cache.mjs` first.

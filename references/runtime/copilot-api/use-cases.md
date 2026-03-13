@@ -8,6 +8,7 @@ Use these recipes to translate common finance questions into Copilot data retrie
 - If the user asks for a category by plain-English name, be explicit that category-name lookup is not yet captured in the API artifacts.
 - If the user asks for "net worth," verify whether they really mean investment portfolio value, one account's balance, or true cross-account net worth.
 - Confirm with the user before running mutations that change live Copilot data.
+- **Transaction fields like `displayName`, `categoryDisplay`, and `accountName` are automatically augmented with cached data** — see AGENT-NOTES.md for details. Pass `--no-hydrate` to disable.
 - Stop after data retrieval. Use another skill for financial analysis, recommendations, planning, or scenario modeling.
 
 ## 1) Discover Account IDs For A Provider Or Brokerage (e.g., E-Trade)
