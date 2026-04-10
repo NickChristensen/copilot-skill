@@ -1,5 +1,5 @@
 ---
-name: copilot-money-api
+name: copilot-money
 description: Retrieve ground-truth financial data from copilot.money to support answers to user questions about their finances. Use when a user asks about balances, accounts, holdings, cost basis, categorized spending, recurring payments, institutions, transaction history, portfolio trends, allocation, or other personal-finance questions that require facts from Copilot. This skill helps the agent identify what data exists in Copilot, which GraphQL operations expose it, and how to fetch it with the local authenticated runner before any downstream analysis.
 ---
 
