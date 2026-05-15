@@ -13,6 +13,8 @@ const ENUM_VALUES_PATH = path.join(ROOT, "references", "runtime", "copilot-api",
 const SEMANTICS_PATH = path.join(ROOT, "references", "runtime", "copilot-api", "operation-semantics.json");
 const GRAPHQL_URL = "https://app.copilot.money/api/graphql";
 const TOKEN_URL = "https://securetoken.googleapis.com/v1/token";
+const CACHE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+const REQUIRED_CACHE_FILES = ["accounts.json", "categories.json", "category-tree.json", "recurrings.json"];
 
 function printHelp() {
   console.log(`copilot-gql: run Copilot Money GraphQL operations
@@ -20,8 +22,9 @@ function printHelp() {
 Usage:
   copilot-gql list [--descriptions]
   copilot-gql show <OperationName>
-  copilot-gql run <OperationName> [--vars-json '<json>' | --vars-file <file>] [--operation-name <name>] [--no-hydrate]
-  copilot-gql raw --query-file <file> [--vars-json '<json>' | --vars-file <file>] [--operation-name <name>] [--no-hydrate]
+  copilot-gql run <OperationName> [--vars-json '<json>' | --vars-file <file>] [--operation-name <name>] [--no-hydrate] [--refresh-cache | --no-refresh]
+  copilot-gql raw --query-file <file> [--vars-json '<json>' | --vars-file <file>] [--operation-name <name>] [--no-hydrate] [--refresh-cache | --no-refresh]
+  copilot-gql refresh-cache
   copilot-gql token
   copilot-gql help
 
@@ -31,8 +34,10 @@ Examples:
   copilot-gql show TransactionsFeed
   copilot-gql run TransactionsFeed
   copilot-gql run TransactionsFeed --no-hydrate
+  copilot-gql run TransactionsFeed --refresh-cache
   copilot-gql run TransactionSummary --vars-json '{"filter":{}}'
   copilot-gql raw --query-file ./references/runtime/copilot-api/operations/Tags.graphql --vars-file ./references/runtime/copilot-api/examples/requests/Tags.request.json
+  copilot-gql refresh-cache
 `);
 }
 
@@ -256,10 +261,42 @@ function printEnumHints(query) {
   }
 }
 
-function loadCache() {
-  const accountsPath = path.join(CACHE_DIR, "accounts.json");
-  const categoriesPath = path.join(CACHE_DIR, "categories.json");
-  const recurringsPath = path.join(CACHE_DIR, "recurrings.json");
+function cachePath(file) {
+  return path.join(CACHE_DIR, file);
+}
+
+function inspectCacheFreshness({ force = false } = {}) {
+  if (force) {
+    return { shouldRefresh: true, reason: "forced" };
+  }
+
+  const now = Date.now();
+  const missing = [];
+  const stale = [];
+
+  for (const file of REQUIRED_CACHE_FILES) {
+    const fp = cachePath(file);
+    if (!fs.existsSync(fp)) {
+      missing.push(file);
+      continue;
+    }
+    const ageMs = now - fs.statSync(fp).mtimeMs;
+    if (ageMs > CACHE_MAX_AGE_MS) stale.push(file);
+  }
+
+  if (missing.length > 0) {
+    return { shouldRefresh: true, reason: `missing ${missing.join(", ")}` };
+  }
+  if (stale.length > 0) {
+    return { shouldRefresh: true, reason: `stale ${stale.join(", ")}` };
+  }
+  return { shouldRefresh: false, reason: "fresh" };
+}
+
+function loadCache({ failOnMissing = true } = {}) {
+  const accountsPath = cachePath("accounts.json");
+  const categoriesPath = cachePath("categories.json");
+  const recurringsPath = cachePath("recurrings.json");
 
   const missing = [];
   if (!fs.existsSync(accountsPath)) missing.push("accounts.json");
@@ -267,18 +304,30 @@ function loadCache() {
   if (!fs.existsSync(recurringsPath)) missing.push("recurrings.json");
 
   if (missing.length > 0) {
+    if (!failOnMissing) {
+      console.error(`⚠️  Cache files missing: ${missing.join(", ")}. Output will not be hydrated.`);
+      return null;
+    }
     fail(
       `Cache files missing: ${missing.join(", ")}.\n` +
-      `Run: node scripts/sync-cache.mjs\n` +
+      `Run: node scripts/copilot-gql.mjs refresh-cache\n` +
       `Then retry your command.`
     );
   }
 
-  const accounts = JSON.parse(fs.readFileSync(accountsPath, "utf8"));
-  const categories = JSON.parse(fs.readFileSync(categoriesPath, "utf8"));
-  const recurrings = JSON.parse(fs.readFileSync(recurringsPath, "utf8"));
+  try {
+    const accounts = JSON.parse(fs.readFileSync(accountsPath, "utf8"));
+    const categories = JSON.parse(fs.readFileSync(categoriesPath, "utf8"));
+    const recurrings = JSON.parse(fs.readFileSync(recurringsPath, "utf8"));
 
-  return { accounts, categories, recurrings };
+    return { accounts, categories, recurrings };
+  } catch (err) {
+    if (!failOnMissing) {
+      console.error(`⚠️  Failed to read cache files: ${err?.message || String(err)}. Output will not be hydrated.`);
+      return null;
+    }
+    throw err;
+  }
 }
 
 function hydrateTransaction(tx, { accounts, categories, recurrings }) {
@@ -289,7 +338,7 @@ function hydrateTransaction(tx, { accounts, categories, recurrings }) {
     if (accounts[tx.accountId]) {
       hydrated.accountName = accounts[tx.accountId].name;
     } else {
-      console.error(`⚠️  Missing cache key: accountId "${tx.accountId}". Run: node scripts/sync-cache.mjs`);
+      console.error(`⚠️  Missing cache key: accountId "${tx.accountId}". Run: node scripts/copilot-gql.mjs refresh-cache`);
     }
   }
 
@@ -299,7 +348,7 @@ function hydrateTransaction(tx, { accounts, categories, recurrings }) {
       const { emoji, name } = categories[tx.categoryId];
       hydrated.categoryDisplay = `${emoji || ""} ${name}`;
     } else {
-      console.error(`⚠️  Missing cache key: categoryId "${tx.categoryId}". Run: node scripts/sync-cache.mjs`);
+      console.error(`⚠️  Missing cache key: categoryId "${tx.categoryId}". Run: node scripts/copilot-gql.mjs refresh-cache`);
     }
   }
 
@@ -309,7 +358,7 @@ function hydrateTransaction(tx, { accounts, categories, recurrings }) {
       const {emoji, name} = recurrings[tx.recurringId];
       hydrated.displayName = `${emoji} ${name} (${tx.name})`;
     } else {
-      console.error(`⚠️  Missing cache key: recurringId "${tx.recurringId}". Run: node scripts/sync-cache.mjs`);
+      console.error(`⚠️  Missing cache key: recurringId "${tx.recurringId}". Run: node scripts/copilot-gql.mjs refresh-cache`);
       hydrated.displayName = tx.name;
     }
   } else {
@@ -373,7 +422,7 @@ async function refreshIdToken() {
   return { idToken: json.id_token, expiresIn: json.expires_in };
 }
 
-async function executeGraphql({ operationName, query, variables }, hydrate = true) {
+async function requestGraphql({ operationName, query, variables }) {
   const { idToken } = await refreshIdToken();
   const res = await fetch(GRAPHQL_URL, {
     method: "POST",
@@ -386,17 +435,188 @@ async function executeGraphql({ operationName, query, variables }, hydrate = tru
 
   const txt = await res.text();
   if (!res.ok) {
-    fail(`graphql request failed (${res.status}): ${txt.slice(0, 500)}`);
+    throw new Error(`graphql request failed (${res.status}): ${txt.slice(0, 500)}`);
   }
 
-  const data = JSON.parse(txt);
+  const json = JSON.parse(txt);
+  if (Array.isArray(json.errors) && json.errors.length > 0) {
+    const messages = json.errors
+      .map((err) => err?.message)
+      .filter(Boolean)
+      .join("; ");
+    throw new Error(`graphql ${operationName} returned errors: ${messages || JSON.stringify(json.errors).slice(0, 500)}`);
+  }
+
+  return json;
+}
+
+function expectArray(value, label) {
+  if (!Array.isArray(value)) {
+    throw new Error(`cache refresh expected ${label} to be an array`);
+  }
+  return value;
+}
+
+function writeJsonAtomic(file, value) {
+  const target = cachePath(file);
+  const tmp = path.join(CACHE_DIR, `.${file}.${process.pid}.tmp`);
+  fs.writeFileSync(tmp, JSON.stringify(value, null, 2));
+  fs.renameSync(tmp, target);
+}
+
+async function refreshCache() {
+  fs.mkdirSync(CACHE_DIR, { recursive: true });
+
+  console.error("Refreshing cache...");
+
+  const accountsQuery = loadQueryFromOperation("Accounts");
+  const recurringsQuery = loadQueryFromOperation("Recurrings");
+  const categoriesQuery = `query GetCategories {
+  categories {
+    id
+    name
+    icon {
+      ... on EmojiUnicode {
+        unicode
+        __typename
+      }
+      __typename
+    }
+    childCategories {
+      id
+      name
+      icon {
+        ... on EmojiUnicode {
+          unicode
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}`;
+
+  const [accountsData, categoriesData, recurringsData] = await Promise.all([
+    requestGraphql({
+      operationName: "Accounts",
+      query: accountsQuery,
+      variables: { filter: null }
+    }),
+    requestGraphql({
+      operationName: "GetCategories",
+      query: categoriesQuery,
+      variables: {}
+    }),
+    requestGraphql({
+      operationName: "Recurrings",
+      query: recurringsQuery,
+      variables: {}
+    })
+  ]);
+
+  const rawAccounts = expectArray(accountsData.data?.accounts, "data.accounts");
+  const rawCats = expectArray(categoriesData.data?.categories, "data.categories");
+  const rawRecurrings = expectArray(recurringsData.data?.recurrings, "data.recurrings");
+
+  const accounts = {};
+  for (const acct of rawAccounts) {
+    if (acct.id && acct.name) {
+      accounts[acct.id] = { name: acct.name, type: acct.type, subType: acct.subType, mask: acct.mask ?? null };
+    }
+  }
+
+  const categories = {};
+  const categoryTree = {};
+  for (const cat of rawCats) {
+    if (!cat.id || !cat.name) continue;
+    const parentEmoji = cat.icon?.unicode ?? null;
+    categories[cat.id] = { name: cat.name, parentId: null, parentName: null, emoji: parentEmoji };
+    categoryTree[cat.id] = {
+      name: cat.name,
+      emoji: parentEmoji,
+      children: (cat.childCategories ?? []).map((s) => ({
+        id: s.id,
+        name: s.name,
+        emoji: s.icon?.unicode ?? null
+      }))
+    };
+    for (const sub of cat.childCategories ?? []) {
+      if (sub.id && sub.name) {
+        categories[sub.id] = {
+          name: sub.name,
+          parentId: cat.id,
+          parentName: cat.name,
+          emoji: sub.icon?.unicode ?? null
+        };
+      }
+    }
+  }
+
+  const recurrings = {};
+  for (const r of rawRecurrings) {
+    if (r.id && r.name) {
+      recurrings[r.id] = {
+        name: r.name,
+        emoji: r.icon?.unicode,
+        frequency: r.frequency,
+        amount: r.nextPaymentAmount,
+        categoryId: r.categoryId,
+        state: r.state
+      };
+    }
+  }
+
+  writeJsonAtomic("accounts.json", accounts);
+  writeJsonAtomic("categories.json", categories);
+  writeJsonAtomic("category-tree.json", categoryTree);
+  writeJsonAtomic("recurrings.json", recurrings);
+
+  console.error(
+    `Cache refreshed: ${Object.keys(accounts).length} accounts, ` +
+    `${Object.keys(categories).length} categories, ${Object.keys(recurrings).length} recurrings`
+  );
+
+  return {
+    accounts: Object.keys(accounts).length,
+    categories: Object.keys(categories).length,
+    recurrings: Object.keys(recurrings).length
+  };
+}
+
+function maybeRefreshCache(args, hydrate) {
+  if (args["no-refresh"]) return Promise.resolve({ refreshed: false, skipped: true });
+  if (!hydrate && !args["refresh-cache"]) return Promise.resolve({ refreshed: false, skipped: true });
+
+  const freshness = inspectCacheFreshness({ force: Boolean(args["refresh-cache"]) });
+  if (!freshness.shouldRefresh) return Promise.resolve({ refreshed: false, skipped: false });
+
+  console.error(`Cache refresh started (${freshness.reason})...`);
+  return refreshCache()
+    .then((result) => ({ refreshed: true, ...result }))
+    .catch((err) => {
+      console.error(`⚠️  Cache refresh failed: ${err?.message || String(err)}. Continuing with existing cache.`);
+      return { refreshed: false, failed: true };
+    });
+}
+
+async function executeGraphql({ operationName, query, variables }, { hydrate = true, args = {} } = {}) {
+  const cacheRefresh = maybeRefreshCache(args, hydrate);
+  const data = await requestGraphql({ operationName, query, variables });
 
   if (hydrate) {
-    const cache = loadCache();
+    await cacheRefresh;
+    const cache = loadCache({ failOnMissing: false });
+    if (!cache) {
+      console.log(JSON.stringify(data, null, 2));
+      return;
+    }
     const hydrated = hydrateResponse(data, cache);
     console.log(JSON.stringify(hydrated, null, 2));
   } else {
-    console.log(txt);
+    await cacheRefresh;
+    console.log(JSON.stringify(data));
   }
 }
 
@@ -413,6 +633,12 @@ async function main() {
   if (cmd === "token") {
     const tok = await refreshIdToken();
     console.log(JSON.stringify({ ok: true, expires_in: tok.expiresIn }, null, 2));
+    return;
+  }
+
+  if (cmd === "refresh-cache") {
+    const result = await refreshCache();
+    console.log(JSON.stringify(result, null, 2));
     return;
   }
 
@@ -434,7 +660,7 @@ async function main() {
     const query = loadQueryFromOperation(op);
     const variables = loadVars(args, op);
     const operationName = String(args["operation-name"] || op);
-    await executeGraphql({ operationName, query, variables }, !args["no-hydrate"]);
+    await executeGraphql({ operationName, query, variables }, { hydrate: !args["no-hydrate"], args });
     return;
   }
 
@@ -444,7 +670,7 @@ async function main() {
     const query = loadQueryFromFile(String(queryFile));
     const variables = loadVars(args);
     const operationName = String(args["operation-name"] || "RawOperation");
-    await executeGraphql({ operationName, query, variables }, !args["no-hydrate"]);
+    await executeGraphql({ operationName, query, variables }, { hydrate: !args["no-hydrate"], args });
     return;
   }
 

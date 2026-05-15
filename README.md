@@ -75,6 +75,23 @@ Treat both values as secrets.
 4. Fetch the data.
 5. Pass the retrieved facts into a separate analysis step if needed.
 
+## Cache Lifecycle
+
+`scripts/copilot-gql.mjs` hydrates transaction responses with local cache data from `cache/accounts.json`, `cache/categories.json`, `cache/category-tree.json`, and `cache/recurrings.json`.
+
+Hydrated `run` and `raw` commands automatically refresh missing or stale cache files. Cache files are considered stale after seven days. Refresh runs in parallel with the requested GraphQL query, then hydration waits for the refreshed cache when available.
+
+Useful commands and flags:
+
+```bash
+node scripts/copilot-gql.mjs refresh-cache
+node scripts/copilot-gql.mjs run TransactionsFeed --refresh-cache
+node scripts/copilot-gql.mjs run TransactionsFeed --no-refresh
+node scripts/copilot-gql.mjs run TransactionsFeed --no-hydrate
+```
+
+If automatic refresh fails, the runner warns and continues with existing cache when possible. If no usable cache exists, it prints the unhydrated GraphQL response instead of failing the query.
+
 ## Notes
 
 - Copilot should be treated as the user's financial data hub, similar to Mint-style aggregation.

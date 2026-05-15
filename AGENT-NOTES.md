@@ -7,35 +7,36 @@ Update this file as new patterns emerge.
 
 ## Cache Files
 
-Run `node scripts/sync-cache.mjs` to populate (or refresh) four lookup files in `cache/`:
+Hydrated `copilot-gql` commands automatically refresh missing or stale lookup files in `cache/`.
+Run `node scripts/copilot-gql.mjs refresh-cache` to populate or refresh them manually:
 
 | File | Contents |
 |------|----------|
-| `cache/accounts.json` | `id → {name, type, subType, mask}` — all 23 accounts across checking, credit, investment, mortgage, real estate |
-| `cache/categories.json` | `id → {name, parentId, parentName, emoji}` — all 34 categories (flat); subcategories include parent info for rollups |
+| `cache/accounts.json` | `id → {name, type, subType, mask}` — cached account metadata |
+| `cache/categories.json` | `id → {name, parentId, parentName, emoji}` — flat category metadata; subcategories include parent info for rollups |
 | `cache/category-tree.json` | `id → {name, emoji, children: [{id, name, emoji}]}` — top-level categories with subcategories nested |
-| `cache/recurrings.json` | `id → {name, emoji, frequency, amount, categoryId, state}` — all recurring payments with metadata |
+| `cache/recurrings.json` | `id → {name, emoji, frequency, amount, categoryId, state}` — recurring-payment metadata |
 
-These change infrequently. Re-run sync when Nick adds a new account or changes categories.
+These change infrequently. The runner treats cache files older than seven days as stale. Use `--refresh-cache` to force a refresh before hydration, or `--no-refresh` to skip automatic refresh for a command.
 
 ### Category rollups
 
-To aggregate spending by top-level category (e.g. "Household"), use `category-tree.json`
+To aggregate spending by top-level category, use `category-tree.json`
 to find all child IDs, then sum transactions whose `categoryId` is in that set:
 
 ```js
 const tree = JSON.parse(fs.readFileSync("cache/category-tree.json", "utf8"));
 
-// Find all categoryIds that belong to "Household"
-const householdEntry = Object.entries(tree).find(([, v]) => v.name === "Household");
-const householdIds = new Set([
-  householdEntry[0],
-  ...householdEntry[1].children.map(c => c.id)
+// Find all categoryIds that belong to the requested top-level category
+const categoryEntry = Object.entries(tree).find(([, v]) => v.name === targetCategoryName);
+const categoryIds = new Set([
+  categoryEntry[0],
+  ...categoryEntry[1].children.map(c => c.id)
 ]);
 
 // Sum transactions
 const total = transactions
-  .filter(tx => householdIds.has(tx.categoryId))
+  .filter(tx => categoryIds.has(tx.categoryId))
   .reduce((sum, tx) => sum + tx.amount, 0);
 ```
 

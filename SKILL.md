@@ -162,10 +162,12 @@ When asked to discover new operations:
 
 Transactions return `accountId`, `categoryId`, and `recurringId` as opaque IDs — not human-readable names.
 Fields like `displayName`, `categoryDisplay`, and `accountName` are automatically augmented with cached data (see AGENT-NOTES.md). Pass `--no-hydrate` to disable this.
+Hydrated commands automatically refresh missing or stale cache files in parallel with the requested query. Pass `--no-refresh` to skip that behavior, or `--refresh-cache` to force it.
 
 ```bash
 node scripts/copilot-gql.mjs run TransactionsFeed | jq
 node scripts/copilot-gql.mjs run Transactions --no-hydrate | jq
+node scripts/copilot-gql.mjs refresh-cache
 ```
 
 **Cache files used for hydration:**
@@ -173,10 +175,11 @@ node scripts/copilot-gql.mjs run Transactions --no-hydrate | jq
 ```
 cache/accounts.json       — id → {name, type, subType, mask}
 cache/categories.json     — id → {name, parentId, parentName, emoji}
-cache/recurrings.json    — id → {name, emoji, frequency, amount, categoryId, state}
+cache/category-tree.json  — id → {name, emoji, children: [{id, name, emoji}]}
+cache/recurrings.json     — id → {name, emoji, frequency, amount, categoryId, state}
 ```
 
-If the cache files don't exist, run `node scripts/sync-cache.mjs` first.
+If you need to refresh the cache manually, run `node scripts/copilot-gql.mjs refresh-cache`.
 
 For worked examples, rollup patterns, and known API quirks discovered at runtime, see:
 → **`AGENT-NOTES.md`** in this skill's root directory.
