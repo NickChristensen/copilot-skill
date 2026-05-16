@@ -35,6 +35,7 @@ Examples:
   copilot-gql run TransactionsFeed
   copilot-gql run TransactionsFeed --no-hydrate
   copilot-gql run TransactionsFeed --refresh-cache
+  copilot-gql run TransactionsFeed --vars-json '{"filter":{"dates":[{"start":"2026-02-01","end":"2026-02-28"}]}}'
   copilot-gql run TransactionSummary --vars-json '{"filter":{}}'
   copilot-gql raw --query-file ./references/runtime/copilot-api/operations/Tags.graphql --vars-file ./references/runtime/copilot-api/examples/requests/Tags.request.json
   copilot-gql refresh-cache
@@ -113,6 +114,49 @@ function loadVars(opts, fallbackOperationName) {
     }
   }
   return {};
+}
+
+function utcMidnightSecondsFromDateOnly(value) {
+  if (typeof value !== "string") return value;
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return value;
+
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const date = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
+
+  if (
+    date.getUTCFullYear() !== year ||
+    date.getUTCMonth() !== month - 1 ||
+    date.getUTCDate() !== day
+  ) {
+    fail(`invalid date-only value: ${value}`);
+  }
+
+  return Math.floor(date.getTime() / 1000);
+}
+
+function normalizeTransactionDateFilters(variables) {
+  if (!variables || typeof variables !== "object" || Array.isArray(variables)) return variables;
+
+  const dates = variables.filter?.dates;
+  if (!Array.isArray(dates)) return variables;
+
+  return {
+    ...variables,
+    filter: {
+      ...variables.filter,
+      dates: dates.map((range) => {
+        if (!range || typeof range !== "object" || Array.isArray(range)) return range;
+        return {
+          ...range,
+          start: utcMidnightSecondsFromDateOnly(range.start),
+          end: utcMidnightSecondsFromDateOnly(range.end)
+        };
+      })
+    }
+  };
 }
 
 function loadQueryFromOperation(op) {
@@ -658,7 +702,7 @@ async function main() {
     const op = args._[1];
     if (!op) fail("missing operation name for run");
     const query = loadQueryFromOperation(op);
-    const variables = loadVars(args, op);
+    const variables = normalizeTransactionDateFilters(loadVars(args, op));
     const operationName = String(args["operation-name"] || op);
     await executeGraphql({ operationName, query, variables }, { hydrate: !args["no-hydrate"], args });
     return;
@@ -668,7 +712,7 @@ async function main() {
     const queryFile = args["query-file"];
     if (!queryFile) fail("missing --query-file for raw");
     const query = loadQueryFromFile(String(queryFile));
-    const variables = loadVars(args);
+    const variables = normalizeTransactionDateFilters(loadVars(args));
     const operationName = String(args["operation-name"] || "RawOperation");
     await executeGraphql({ operationName, query, variables }, { hydrate: !args["no-hydrate"], args });
     return;

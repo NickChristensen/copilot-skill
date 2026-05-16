@@ -164,8 +164,11 @@ Transactions return `accountId`, `categoryId`, and `recurringId` as opaque IDs â
 Fields like `displayName`, `categoryDisplay`, and `accountName` are automatically augmented with cached data (see AGENT-NOTES.md). Pass `--no-hydrate` to disable this.
 Hydrated commands automatically refresh missing or stale cache files in parallel with the requested query. Pass `--no-refresh` to skip that behavior, or `--refresh-cache` to force it.
 
+For transaction date filters, pass `YYYY-MM-DD` strings in `filter.dates[].start` and `filter.dates[].end`; the runner converts them to UTC-midnight Unix seconds. Copilot treats those bounds as inclusive date labels, and transaction `date` fields are returned as date-only strings.
+
 ```bash
 node scripts/copilot-gql.mjs run TransactionsFeed | jq
+node scripts/copilot-gql.mjs run TransactionsFeed --vars-json '{"filter":{"dates":[{"start":"2026-02-01","end":"2026-02-28"}]}}' | jq
 node scripts/copilot-gql.mjs run Transactions --no-hydrate | jq
 node scripts/copilot-gql.mjs refresh-cache
 ```

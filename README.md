@@ -92,6 +92,16 @@ node scripts/copilot-gql.mjs run TransactionsFeed --no-hydrate
 
 If automatic refresh fails, the runner warns and continues with existing cache when possible. If no usable cache exists, it prints the unhydrated GraphQL response instead of failing the query.
 
+## Transaction Date Filters
+
+For transaction `filter.dates`, prefer `YYYY-MM-DD` strings:
+
+```bash
+node scripts/copilot-gql.mjs run TransactionsFeed --vars-json '{"filter":{"dates":[{"start":"2026-02-01","end":"2026-02-28"}]}}'
+```
+
+The runner converts those date-only strings to UTC-midnight Unix seconds before calling Copilot. Copilot treats the start and end bounds as inclusive date labels, so passing the same date for both fields returns all transactions for that date.
+
 ## Notes
 
 - Copilot should be treated as the user's financial data hub, similar to Mint-style aggregation.

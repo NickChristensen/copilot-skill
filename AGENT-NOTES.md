@@ -47,6 +47,10 @@ const total = transactions
 - `categories` (plural) is a valid root query — returns all top-level categories with
   `childCategories`. The captured operations didn't include this; use `raw` with
   `--operation-name GetCategories`.
+- Transaction date filters accept `YYYY-MM-DD` strings in `filter.dates[].start` and
+  `filter.dates[].end`; the runner converts them to UTC-midnight Unix seconds. Copilot
+  treats those bounds as inclusive date labels. Transaction `date` fields are returned
+  as date-only strings, not timezone-adjusted timestamps.
 - `category { name }` is a valid field but the default `CategoryKeyMetrics` query doesn't
   request it. Add it manually when needed.
 - `TransactionsFeed` default vars include `"month": true` which injects `TransactionMonth`
